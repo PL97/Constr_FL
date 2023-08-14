@@ -6,4 +6,5 @@ There are three problems in this repo
   
   entry file: lcqp.py
 - Nayman Pearson classification
+  
   entry file: NPclf.py
