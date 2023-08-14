@@ -3,6 +3,7 @@
 
 There are three problems in this repo
 - Linear constrained quadratic programming (LCQP)
+  
   entry file: lcqp.py
 - Nayman Pearson classification
-  NPclf.py
+  entry file: NPclf.py
