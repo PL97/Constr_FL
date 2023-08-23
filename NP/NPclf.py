@@ -10,7 +10,7 @@ for ii in range(1, num_seed + 1):
     print(ii)
     np.random.seed(ii)
 
-    d = 100 #! 30 ~ 50
+    d = 10 #! 30 ~ 50
     n = 5
     Ni0 = 1000 #! 30000
     Ni1 = 300
@@ -30,14 +30,15 @@ for ii in range(1, num_seed + 1):
     wfeas = minimize(Loss1, w0, tol=eps, method="L-BFGS-B")['x']
     
     rfull = np.zeros(n)
-    delta_r = 1
+    delta_r = 1 * Ni1
     for i in range(n):
-        rfull[i] = np.sum(-np.log(sigmoid(wfeas.T @ X1[:, :, i]))) + delta_r
+        # rfull[i] = np.sum(-np.log(sigmoid(wfeas.T @ X1[:, :, i]))) + delta_r
+        rfull[i] = delta_r
 
     w0 = np.zeros(d)
     mu0full = np.zeros(n)
-    rhofull = np.ones(n) * 0.05 #! set a smaller number, check the constraints
-    beta = 100
+    rhofull = np.ones(n) * 0.01 #! set a smaller number, check the constraints
+    beta = 1
     eps1 = 1e-3
     eps2 = 1e-3
 

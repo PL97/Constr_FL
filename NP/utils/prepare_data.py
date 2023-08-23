@@ -8,8 +8,8 @@ import math
 def load_uci(name="adult", num_split=5, seed=10):
     np.random.seed(seed)
     path = "/home/le/Constr_FL/Cleaned_UCI_Datasets/binary_data/"
-    df = pd.read_csv(os.path.join(path, name+".csv")).iloc[:300, :]
-    # df = pd.read_csv(os.path.join(path, name+".csv"))
+    # df = pd.read_csv(os.path.join(path, name+".csv")).iloc[:300, :]
+    df = pd.read_csv(os.path.join(path, name+".csv"))
 
     n_total = df.shape[0]
     features = df.iloc[:, :-1].to_numpy()
