@@ -58,8 +58,8 @@ def proxAL(w0, mu0full, X0, X1, r, admm, beta, rhofull, eps1, eps2):
             obj_mea[i] = np.sum(inner_prod_X0-np.log(sigmoid(inner_prod_X0)+eps)) 
         
         feas_val = max(feas_mea)
-        print(feas_mea)
-        print(obj_mea)
+        # print(feas_mea)
+        # print(obj_mea)
         print(model_eval(wc, X0, X1))
 
         if np.linalg.norm(wp - wc, np.inf) + beta * tauk <= beta * eps1:

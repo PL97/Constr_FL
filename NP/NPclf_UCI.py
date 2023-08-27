@@ -35,7 +35,7 @@ for ii in range(1, num_seed + 1):
     
     
     rfull = np.zeros(n)
-    delta_r = 5 * Ni1
+    delta_r = 0.1 * Ni1
 
     for i in range(n):
         # rfull[i] = np.sum(-np.log(sigmoid(wfeas.T @ X1[:, :, i]))) + delta_r
@@ -43,8 +43,8 @@ for ii in range(1, num_seed + 1):
 
     w0 = np.zeros(d)
     mu0full = np.zeros(n)
-    rhofull = np.ones(n) * 0.1 #! set a smaller number, check the constraints
-    beta = 1
+    rhofull = np.ones(n) * 0.01 #! set a smaller number, check the constraints
+    beta = 10
     eps1 = 1e-3
     eps2 = 1e-3
 

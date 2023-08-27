@@ -44,9 +44,9 @@ def DLoss2(w):
 
 
 w0 = np.ones(d)
-lr = 1
+lr = 0.001
 
-total_e = 50
+total_e = 50000
 
 for i in range(total_e):
     print(Loss2(w0))
@@ -59,15 +59,15 @@ for i in range(total_e):
     
 print("------------------------------------")
 
-lr = 10
+# total_e = 5000
+# lr = 0.1
 
-for i in range(total_e):
-    print(Loss1(w0))
-    w0 -= lr * DLoss1(w0)
-    model_eval(w0, X0full_ex, X1full_ex)
+# for i in range(total_e):
+#     print(Loss1(w0))
+#     w0 -= lr * DLoss1(w0)
+#     model_eval(w0, X0full_ex, X1full_ex)
     
     
-w0 = minimize(Loss1, w0, tol=0.0001, method="L-BFGS-B")['x']
-model_eval(np.ones(d), X0full_ex, X1full_ex)
-asdf
+# w0 = minimize(Loss1, w0, tol=0.0001, method="L-BFGS-B")['x']
+# model_eval(np.ones(d), X0full_ex, X1full_ex)
     

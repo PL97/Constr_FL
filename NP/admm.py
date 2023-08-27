@@ -14,7 +14,7 @@ def sigmoid(x):
 def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
     d, _, n = X0.shape
     # q = 0.9
-    q = 0.9
+    q = 0.95
 
     u0 = np.zeros((d, n))
     for i in range(n):
@@ -23,11 +23,13 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
     lmda = np.zeros((d, n))
     for i in range(n):
         def DPi(w):
-            sigmoid_term = sigmoid(np.dot(w.T, X0[:, :, i]))
-            first_term = np.dot(X0[:, :, i], sigmoid_term.T)
-            second_term = -np.dot(X1[:, :, i], 1 / (1 + np.exp(np.dot(w.T, X1[:, :, i]))))
+            # sigmoid_term = sigmoid(np.dot(w.T, X0[:, :, i]))
+            inner_prod_X0 = np.dot(w.T, X0[:, :, i])
+            inner_prod_X1 = np.dot(w.T, X1[:, :, i])
+            first_term = np.dot(X0[:, :, i], sigmoid(inner_prod_X0).T)
+            second_term = -np.dot(X1[:, :, i], sigmoid(-inner_prod_X1))
             third_term = (w - w0) / ((n + 1) * beta)
-            return (1/(X0.shape[1]))*(first_term) + (1/X1.shape[1]) * (second_term*np.maximum(mu[i] + beta * (np.sum(-np.dot(w.T, X1[:, :, i]) + np.log(1 + np.exp(np.dot(w.T, X1[:, :, i])))) - r[i]), 0)) + third_term
+            return (1/(X0.shape[1]))*(first_term) + (1/X1.shape[1]) * (second_term*np.maximum(mu[i] + beta * (np.sum(-np.log(sigmoid(inner_prod_X1))) - r[i]), 0)) + third_term
         
         
         
