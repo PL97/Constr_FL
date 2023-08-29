@@ -30,27 +30,17 @@ def proxAL(w0, mu0full, X0, X1, r, admm, beta, rhofull, eps1, eps2):
         tmp2 = (wc.T@X0.reshape(X0.shape[0], -1)).reshape(X0.shape[1], -1, order='C')
         obj_val = np.mean(np.log(1 + np.exp(tmp2)))
 
-        # for i in range(n):
-        #     mukfull[i] = max(mukfull[i] + beta * (np.sum(-wc.T @ X1[:, :, i] + np.log(1 + np.exp(wc.T @ X1[:, :, i]))) - r[i]), 0)
-        
-        # obj_val = 0
-        # for i in range(n):
-        #     obj_val += np.sum(np.log(1 + np.exp(wc.T @ X0[:, :, i])))
-            
-            
         
         stat_mea = np.zeros(d)
         for i in range(n):
-            stat_mea += (1/X0.shape[1]) * X0[:, :, i] @ (np.exp(wc.T @ X0[:, :, i]) / (1 + np.exp(wc.T @ X0[:, :, i]))) + (1/X1.shape[1]) * (-X1[:, :, i] @ (1 / (1 + np.exp(wc.T @ X1[:, :, i])))) * mukfull[i]
+            stat_mea += (1/X0.shape[1]) * X0[:, :, i] @ sigmoid(wc.T @ X0[:, :, i]) + (1/X1.shape[1]) * (-X1[:, :, i] @ sigmoid(-wc.T @ X1[:, :, i])) * mukfull[i]
 
-        
         
         stat_val = np.linalg.norm(stat_mea, np.inf)
         
         feas_mea = np.zeros(n)
         obj_mea = np.zeros(n)
         for i in range(n):
-            # feas_mea[i] = max(np.sum(-wc.T @ X1[:, :, i] + np.log(1 + np.exp(wc.T @ X1[:, :, i]))) - r[i], 0)
             feas_mea[i] = max(np.sum(-np.log(sigmoid(wc.T @ X1[:, :, i]))) - r[i], 0)
 
             eps = 1e-100

@@ -18,7 +18,7 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
             first_term = np.dot(X0[:, :, i], sigmoid_term.T)
             second_term = -np.dot(X1[:, :, i], 1 / (1 + np.exp(np.dot(w.T, X1[:, :, i]))))
             third_term = (w - w0) / ((n + 1) * beta)
-            return first_term + second_term*np.maximum(mu[i] + beta * (np.sum(-np.dot(w.T, X1[:, :, i]) + np.log(1 + np.exp(np.dot(w.T, X1[:, :, i])))) - r[i]), 0) + third_term
+            return first_term + second_term*np.maximum(mu[i] + beta * (np.sum(-sigmoid(w.T@X1[:, :, i])) - r[i]), 0) + third_term
         
         lmda[:, i] = -DPi(w0)
 
