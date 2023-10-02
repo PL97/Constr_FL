@@ -8,10 +8,6 @@ Created on Tue Aug 29 14:02:10 2023
 import numpy as np
 from proxAL import proxAL
 from admm import admm, sigmoid
-
-import sys
-sys.path.append("./centralized algs/")
-
 from admm_uc import admm_uc
 from solve_uc import solve_uc
 from solve_c import solve_c
@@ -22,28 +18,34 @@ from utils.eval import model_eval
 
 np.random.seed(1)
 
-d = 10 #! 30 ~ 50
-n = 5
-Ni0 = 100 #! 30000
-Ni1 = 10
+#d = 10 #! 30 ~ 50
+#n = 5
+#Ni0 = 100 #! 30000
+#Ni1 = 10
 
-X0 = (np.random.rand(d, Ni0, n)- 0.3)
-X1 = (np.random.rand(d, Ni1, n) - 1 + 0.3)
+#X0 = (np.random.rand(d, Ni0, n)- 0.3)
+#X1 = (np.random.rand(d, Ni1, n) - 1 + 0.3)
+
+n = 5
+#X0, X1, d = load_uci(name="monks-1", num_split=n)
+X0, X1, d = load_uci(name="monks-1", num_split=n)
+Ni0 = X0.shape[1]
+Ni1 = X1.shape[1]
 
 w0 = np.ones(d)
 
-tau = 1e-3
+tau = 1e-2
 
 eps1 = tau 
 
 eps2 = tau
 
-beta = 1
+beta = 100
 
 
 mu0 = np.zeros(n)
 
-r = np.ones(n) *1
+r = np.ones(n)*0.01* Ni1
 
 #wsol_uc = solve_uc(w0, X0, X1, tau)
 wsol_c, mu_c, out_iter = solve_c(w0, mu0, X0, X1, r, beta, eps1, eps2)
@@ -115,7 +117,7 @@ def c_stat(w, mu):
 #print("stationary measure (decentralized, unconstrained): ", uc_stat(wsol_fluc))
 
 print("stationary measure (centralized, constrained): ", [c_stat(wsol_c,mu_c),max(constr_val(wsol_c) - r)])
-print("stationary measure (centralized, constrained): ", [c_stat(wsol_flc,mu_flc),max(constr_val(wsol_flc) - r)])
+print("stationary measure (decentralized, constrained): ", [c_stat(wsol_flc,mu_flc),max(constr_val(wsol_flc) - r)])
 
 
 #print(wsol_c)

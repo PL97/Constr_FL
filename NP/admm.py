@@ -32,7 +32,7 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
         
         lmda[:, i] = -DPi(w0)
 
-    T = 200
+    T = 500
     eps = 1e-50
     wc = w0
     uc = u0

@@ -10,9 +10,9 @@ from admm import sigmoid
 
 def proxAL(w0, mu0full, X0, X1, r, admm, beta, rhofull, eps1, eps2):
     wc = w0
-    K = 200
+    K = 500
     mukfull = mu0full
-    bars = 1
+    bars = 0.01
 
     in_iter = 0
 
@@ -50,8 +50,8 @@ def proxAL(w0, mu0full, X0, X1, r, admm, beta, rhofull, eps1, eps2):
         
         feas_val = max(feas_mea)
         
-        print("diffmu: ", max(np.abs(mupfull - mukfull)))
-        print("diffw: ", np.linalg.norm(wp - wc, np.inf) + beta * tauk)
+        print("diffmu: ", max(np.abs(mupfull - mukfull))/beta)
+        print("diffw: ", np.linalg.norm(wp - wc, np.inf)/beta + tauk)
         
         if np.linalg.norm(wp - wc, np.inf) + beta * tauk <= beta * eps1:
             if max(np.abs(mupfull - mukfull)) <= beta * eps2:
