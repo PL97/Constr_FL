@@ -8,15 +8,12 @@ Created on Tue Aug 29 14:02:10 2023
 import numpy as np
 from proxAL import proxAL
 from admm import admm, sigmoid
-
-import sys
-sys.path.append("./centralized algs/")
-
 from admm_uc import admm_uc
-from solve_uc import solve_uc
 from solve_c import solve_c
 from scipy.optimize import minimize
 
+import sys
+sys.path.append("../")
 from utils.prepare_data import load_uci
 from utils.eval import model_eval
 
