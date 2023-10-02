@@ -74,6 +74,7 @@ def measure_runtime(func, **args):
     substr = str(re.findall(r'function calls in [0-9]+.[0-9]+', s.getvalue()))
     ts = re.findall(r'[0-9]+.+[0-9]+', str(substr))[0]
     rets['runtime'] = float(ts)
+    # rets['runtime'] = 0
     return rets
     
     

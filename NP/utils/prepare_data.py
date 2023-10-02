@@ -4,6 +4,15 @@ import os
 from collections import Counter
 import math
 
+import argparse
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data", type=str, help="name of the dataset", default="adult")
+    args = parser.parse_args()
+    return args
+
 
 def load_uci(name="adult", num_split=5, seed=10):
     np.random.seed(seed)
@@ -39,11 +48,14 @@ def load_uci(name="adult", num_split=5, seed=10):
 
 
 
-    
+
+
 
 
 if __name__ == "__main__":
-    X0, X1, _ = load_uci()
+    args = parse_args()
+    X0, X1, _ = load_uci(name=args.data)
     print(_)
+    print(f"imbalance ratio: {X1.shape[1]*X1.shape[2]}/{X0.shape[1]*X0.shape[2]} -- {X1.shape[1]/X0.shape[1]}")
     for i in range(X0.shape[2]):
         print(len(X0[i]), len(X1[i]))

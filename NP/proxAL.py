@@ -7,7 +7,7 @@ def proxAL(w0, mu0full, X0, X1, r, admm, beta, rhofull, eps1, eps2):
     wc = w0
     K = 10000
     mukfull = mu0full
-    bars = 1
+    bars = 1e-4
 
     in_iter = 0
 
@@ -41,20 +41,24 @@ def proxAL(w0, mu0full, X0, X1, r, admm, beta, rhofull, eps1, eps2):
         feas_mea = np.zeros(n)
         obj_mea = np.zeros(n)
         for i in range(n):
-            feas_mea[i] = max(np.sum(-np.log(sigmoid(wc.T @ X1[:, :, i]))) - r[i], 0)
+            feas_mea[i] = max((np.sum(-np.log(sigmoid(wc.T @ X1[:, :, i]))) - r[i])/X1.shape[1], 0)
 
             eps = 1e-100
             inner_prod_X0 = np.dot(wc.T, X0[:, :, i])
-            obj_mea[i] = np.sum(inner_prod_X0-np.log(sigmoid(inner_prod_X0)+eps)) 
+            obj_mea[i] = np.mean(inner_prod_X0-np.log(sigmoid(inner_prod_X0)+eps)) 
         
         feas_val = max(feas_mea)
-        # print(feas_mea)
+        # print(model_eval(wc, X0, X1))
         # print(obj_mea)
-        print(model_eval(wc, X0, X1))
+        print(feas_mea)
+        print(np.linalg.norm(wp - wc, np.inf))
+        print(max(np.abs(mupfull - mukfull)))
+        
 
         if np.linalg.norm(wp - wc, np.inf) + beta * tauk <= beta * eps1:
             if max(np.abs(mupfull - mukfull)) <= beta * eps2:
                 break
+        
         
     out_iter = k + 1
     w = wc

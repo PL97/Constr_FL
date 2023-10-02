@@ -15,8 +15,8 @@ for ii in range(1, num_seed + 1):
     Ni0 = 300 #! 30000
     Ni1 = 100
 
-    X0 = (np.random.rand(d, Ni0, n) - 0.5) * 0.1
-    X1 = (np.random.rand(d, Ni1, n) + 0.5)*0.1
+    X0 = (np.random.rand(d, Ni0, n) - 0.5)
+    X1 = (np.random.rand(d, Ni1, n) + 0.5)
     
     # for i in range(n):
     #     X0[-1, :, i] = 1
@@ -55,7 +55,7 @@ for ii in range(1, num_seed + 1):
     plt.savefig("data.png")
     
     rfull = np.zeros(n)
-    delta_r = 10 * Ni1
+    delta_r = 1 * Ni1
     for i in range(n):
         # rfull[i] = np.sum(-np.log(sigmoid(wfeas.T @ X1[:, :, i]))) + delta_r
         rfull[i] = delta_r
@@ -63,7 +63,7 @@ for ii in range(1, num_seed + 1):
     w0 = np.zeros(d)
     mu0full = np.zeros(n)
     rhofull = np.ones(n) * 0.01 #! set a smaller number, check the constraints
-    beta = 0.01
+    beta = 10
     eps1 = 1e-3
     eps2 = 1e-3
 

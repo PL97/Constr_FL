@@ -16,9 +16,10 @@ def proxAL(w0, mu0full, A, b, C, dfull, admm, beta, rhofull, eps1, eps2, bars = 
     pal = np.zeros((d, n))
 
     for k in range(K + 1):
+        print(k)
 
         # tolerance
-        tauk = bars / (k + 1) ** 2
+        tauk = bars / ((k + 1) ** 2)
         for i in range(n):
             Qal[:, :, i] = A[:, :, i] + beta * C[:, :, i].T @ C[:, :, i] + Id / ((n + 1) * beta)
             pal[:, i] = b[:, i] + beta * C[:, :, i].T @ (mukfull[:, i] / beta + dfull[:, i]) - wc / ((n + 1) * beta)

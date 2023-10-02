@@ -5,24 +5,32 @@ from admm import admm
 from utils import generate_data, format_results, measure_runtime
 
 # Define the size table
+# d_n_m = np.array([
+#     [100, 5, 1],
+#     [100, 10, 1],
+#     [200, 5, 2],
+#     [200, 10, 2],
+#     [300, 5, 3],
+#     [300, 10, 3],
+#     [400, 5, 4],
+#     [400, 10, 4],
+#     [500, 5, 5],
+#     [500, 10, 5],
+# ])
+
 d_n_m = np.array([
-    [100, 5, 1],
-    [100, 10, 1],
-    [200, 5, 2],
-    [200, 10, 2],
-    [300, 5, 3],
-    [300, 10, 3],
-    [400, 5, 4],
-    [400, 10, 4],
-    [500, 5, 5],
-    [500, 10, 5],
+    [10, 1, 1],
+    [200, 1, 1],
+    [300, 1, 1],
+    [400, 1, 1],
+    [500, 1, 1]
 ])
 
 num_spl, _ = d_n_m.shape
 
 num_rdn = 1
 
-repeat_num = 10
+repeat_num = 1
 
 for ii in range(num_spl):
 
@@ -38,15 +46,17 @@ for ii in range(num_spl):
     # hyperparameters
     eps1 = 1e-3
     eps2 = 1e-3
-    beta = 1
-    rhofull = np.ones(n) * 1
+    beta = 10
+    rhofull = np.ones(n) * 10
     w0 = np.ones(d)
     mu0full = np.zeros((m, n))
 
     list_rec = np.zeros((9, repeat_num))
 
     for i in range(repeat_num):
+        print(i)
         np.random.seed(i)
+        w0 = np.ones(d)
         ret_cproxal = measure_runtime(cproxAL, w0=w0, mu0full=mu0full, A=A, b=b, C=C, dfull=dfull, beta=beta, eps1=eps1, eps2=eps2)
 
         list_rec[1, i] = ret_cproxal['objcpal']
@@ -56,12 +66,13 @@ for ii in range(num_spl):
 
 
         w0 = np.ones(d)
+        print("centralized completed")
         
         # proximal AL based FL algorithm
         # Assuming you've implemented the proxAL function properly
         # wpal, objpal, constrpal, floutiter, flttiniter = proxAL(w0, mu0full, A, b, C, dfull, admm, beta, rhofull, eps1, eps2)
         ret_proxal = measure_runtime(proxAL, w0=w0, mu0full=mu0full, A=A, b=b, C=C, dfull=dfull, admm=admm, beta=beta, rhofull=rhofull, eps1=eps1, eps2=eps2)
-        ret_cproxal = measure_runtime(cproxAL, w0=w0, mu0full=mu0full, A=A, b=b, C=C, dfull=dfull, beta=beta, eps1=eps1, eps2=eps2)
+        # ret_cproxal = measure_runtime(cproxAL, w0=w0, mu0full=mu0full, A=A, b=b, C=C, dfull=dfull, beta=beta, eps1=eps1, eps2=eps2)
 
         list_rec[0, i] = ret_proxal["objpal"]
         list_rec[2, i] = ret_proxal["constrpal"]

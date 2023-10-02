@@ -14,7 +14,8 @@ for ii in range(1, num_seed + 1):
     np.random.seed(ii)
 
     n = 5
-    X0, X1, d = load_uci(name="breast-cancer", num_split=n)
+    # X0, X1, d = load_uci(name="breast-cancer-wisc", num_split=n)
+    X0, X1, d = load_uci(name="adult", num_split=n)
     Ni0 = X0.shape[1]
     Ni1 = X1.shape[1]
 
@@ -35,18 +36,18 @@ for ii in range(1, num_seed + 1):
     
     
     rfull = np.zeros(n)
-    delta_r = 0.1 * Ni1
+    delta_r = 0.2 * Ni1
 
     for i in range(n):
         # rfull[i] = np.sum(-np.log(sigmoid(wfeas.T @ X1[:, :, i]))) + delta_r
         rfull[i] = delta_r
 
-    w0 = np.zeros(d)
+    w0 = np.ones(d)
     mu0full = np.zeros(n)
-    rhofull = np.ones(n) * 0.01 #! set a smaller number, check the constraints
-    beta = 10
-    eps1 = 1e-3
-    eps2 = 1e-3
+    rhofull = np.ones(n) * 0.001 #! set a smaller number, check the constraints
+    beta = 100
+    eps1 = 1e-2
+    eps2 = 1e-2
 
     w, out_iter, in_iter, stat_val, feas_val, obj_val = proxAL(w0, mu0full, X0, X1, rfull, admm, beta, rhofull, eps1, eps2)
     sum_table[:, ii - 1] = [out_iter, in_iter, stat_val, feas_val, obj_val]

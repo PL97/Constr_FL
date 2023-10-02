@@ -35,7 +35,7 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
         
         lmda[:, i] = -DPi(w0)
 
-    T = 10000
+    T = 2000
     eps = 1e-100
     wc = w0
     uc = u0
@@ -80,11 +80,12 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
             # uc[:, i] = SpaRSA(up[:, i], Pi, DPi, vareps)
             uc[:, i] = minimize(Pi, up[:, i], tol=vareps, method="L-BFGS-B")['x']
             lmda[:, i] = lmda[:, i] + rhofull[i] * (uc[:, i] - wc)
-            tepst_full[i] = np.linalg.norm(DPic - rhofull[i] * (wc - up[:, i]), np.inf)
+            tepst_full[i] = np.linalg.norm(DPic - rhofull[i] * (wc - up[:, i]), np.inf)/(X1.shape[1]+X1.shape[1])
 
         mod_uc = uc + np.dot(lmda, np.diag(1.0 / rhofull))
 
-        # print("tau: ", np.mean(tepst_full))
+        print("========", t , "============")
+        print("tau: ", np.mean(tepst_full))
         # termination criterion
         if np.mean(tepst_full) <= tau:
             break

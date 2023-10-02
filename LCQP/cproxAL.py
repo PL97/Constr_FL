@@ -3,7 +3,7 @@ from numpy.linalg import solve, norm
 
 def cproxAL(w0, mu0full, A, b, C, dfull, beta, eps1, eps2, bars=0.01):
     wc = w0  # set current iterate to be w0
-    K = 10000  # maximum number of iterations
+    K = 1000  # maximum number of iterations
     mukfull = mu0full  # set current Lagrangian multipliers to be mu0
 
     d, n = b.shape
@@ -31,6 +31,9 @@ def cproxAL(w0, mu0full, A, b, C, dfull, beta, eps1, eps2, bars=0.01):
         if norm(wp - wc, ord=np.inf) + beta * tauk <= beta * eps1:
             if np.max(np.abs(mupfull - mukfull)) <= beta * eps2:
                 break
+            
+        
+        
 
     w = wc
     outiter = k + 1
