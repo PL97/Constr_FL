@@ -1,5 +1,4 @@
 import numpy as np
-# from SpaRSA import SpaRSA
 from scipy.optimize import minimize
 
 def sigmoid(x):
@@ -14,7 +13,7 @@ def sigmoid(x):
 def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
     d, _, n = X0.shape
     # q = 0.9
-    q = 0.95
+    q = 0.9
 
     u0 = np.zeros((d, n))
     for i in range(n):
@@ -23,20 +22,18 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
     lmda = np.zeros((d, n))
     for i in range(n):
         def DPi(w):
-            # sigmoid_term = sigmoid(np.dot(w.T, X0[:, :, i]))
-            inner_prod_X0 = np.dot(w.T, X0[:, :, i])
-            inner_prod_X1 = np.dot(w.T, X1[:, :, i])
-            first_term = np.dot(X0[:, :, i], sigmoid(inner_prod_X0).T)
-            second_term = -np.dot(X1[:, :, i], sigmoid(-inner_prod_X1))
+            sigmoid_term = sigmoid(np.dot(w.T, X0[:, :, i]))
+            first_term = np.dot(X0[:, :, i], sigmoid_term.T)
+            second_term = -np.dot(X1[:, :, i], 1 / (1 + np.exp(np.dot(w.T, X1[:, :, i]))))
             third_term = (w - w0) / ((n + 1) * beta)
-            return (1/(X0.shape[1]))*(first_term) + (1/X1.shape[1]) * (second_term*np.maximum(mu[i] + beta * (np.sum(-np.log(sigmoid(inner_prod_X1))) - r[i]), 0)) + third_term
+            return (first_term + second_term*np.maximum(mu[i] + beta * (np.sum(-np.dot(w.T, X1[:, :, i]) + np.log(1 + np.exp(np.dot(w.T, X1[:, :, i])))) - r[i]), 0)) + third_term
         
         
         
         lmda[:, i] = -DPi(w0)
 
-    T = 2000
-    eps = 1e-100
+    T = 200
+    eps = 1e-50
     wc = w0
     uc = u0
     mod_uc = uc + np.dot(lmda, np.diag(1.0 / rhofull))
@@ -44,7 +41,7 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
 
     for t in range(T + 1):
         # print(t)
-        vareps = max(1e-20, q ** t)
+        vareps = max(1e-10, q ** t)
 
         # perform aggregation
         wc = (np.dot(mod_uc, rhofull) + w0 / ((n + 1) * beta)) / (np.sum(rhofull) + 1 / ((n + 1) * beta))
@@ -55,12 +52,12 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
             def Pi(w):
                 inner_prod_X0 = np.dot(w.T, X0[:, :, i])
                 inner_prod_X1 = np.dot(w.T, X1[:, :, i])
-                first_term = np.sum(inner_prod_X0-np.log(sigmoid(inner_prod_X0)+eps))    #! add a eps term to avoid log 0
+                first_term = np.sum(inner_prod_X0-np.log(sigmoid(inner_prod_X0)+eps)) + np.sum(-np.log(sigmoid(inner_prod_X1)+eps))   #! add a eps term to avoid log 0
                 second_term = np.maximum(mu[i] + beta * (np.sum(-np.log(sigmoid(inner_prod_X1)+eps)) - r[i]), 0) ** 2 / (2 * beta)
                 third_term = np.linalg.norm(w - w0, 2) ** 2 / (2 * (n + 1) * beta)
                 fourth_term = np.dot(lmda[:, i], w - wc)
                 fifth_term = np.dot(rhofull[i], np.linalg.norm(w - wc, 2) ** 2) / 2
-                return (1/(X0.shape[1]))*first_term + (1/X1.shape[1]) * second_term + third_term + fourth_term + fifth_term
+                return first_term + second_term + third_term + fourth_term + fifth_term
             
             
             def DPi(w):
@@ -71,7 +68,7 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
                 second_term = -np.dot(X1[:, :, i], sigmoid(-inner_prod_X1))
                 third_term = (w - w0) / ((n + 1) * beta)
                 fourth_term = lmda[:, i] + rhofull[i] * (w - wc)
-                return (1/(X0.shape[1]))*(first_term) + (1/X1.shape[1])*(second_term * np.maximum(mu[i] + beta * (np.sum(-np.log(sigmoid(inner_prod_X1)+eps)) - r[i]), 0)) + third_term + fourth_term
+                return first_term + second_term + second_term * np.maximum(mu[i] + beta * (np.sum(-np.log(sigmoid(inner_prod_X1)+eps)) - r[i]), 0) + third_term + fourth_term
             
             
             
@@ -80,16 +77,17 @@ def admm(w0, X0, X1, mu, r, rhofull, beta, tau):
             # uc[:, i] = SpaRSA(up[:, i], Pi, DPi, vareps)
             uc[:, i] = minimize(Pi, up[:, i], tol=vareps, method="L-BFGS-B")['x']
             lmda[:, i] = lmda[:, i] + rhofull[i] * (uc[:, i] - wc)
-            tepst_full[i] = np.linalg.norm(DPic - rhofull[i] * (wc - up[:, i]), np.inf)/(X1.shape[1]+X1.shape[1])
+            tepst_full[i] = np.linalg.norm(DPic - rhofull[i] * (wc - up[:, i]), np.inf)
 
         mod_uc = uc + np.dot(lmda, np.diag(1.0 / rhofull))
 
-        print("========", t , "============")
-        print("tau: ", np.mean(tepst_full))
+        # print("tau: ", np.mean(tepst_full))
         # termination criterion
         if np.mean(tepst_full) <= tau:
             break
 
     in_iter = t + 1
     w = wc
+    
+    print(t)
     return w, in_iter
