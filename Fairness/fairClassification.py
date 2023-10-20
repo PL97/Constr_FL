@@ -1,60 +1,75 @@
 
 import numpy as np
-from admm import admm
-from proxal import federa_proxAL, central_proxAL
-from utils.utils import constr_stat, obj_val, cnstr_val
-
-
-d = 5     # number of features
-n = 5     # number of clients
-Ni0 = 100 # number of class 0 in client i
-Ni1 = 100  # number of class 1 in client i
-
-
-N = (Ni0+Ni1) * n
-
-# generate the imbalanced dataset
-X0_ns = (np.random.rand(d-1, Ni0, n)- 0.3)
-X1_ns = (np.random.rand(d-1, Ni1, n) - 1 + 0.3)
-
-X0_s = np.random.randint(2, size=(Ni0, n))
-X1_s = np.random.randint(2, size=(Ni1, n))
-
-
-X0 = np.zeros((d,Ni0,n))
-X1 = np.zeros((d,Ni1,n))
-
-for i in range(n):
-    X0[:,:,i] = np.concatenate((X0_ns[:,:,i],X0_s[:,i].reshape((1,Ni0))), axis=0)
-    X1[:,:,i] = np.concatenate((X1_ns[:,:,i],X1_s[:,i].reshape((1,Ni1))), axis=0)
-
-
-mu0 = np.zeros((2,n))
-beta = 10
 
 
 
-w0 = np.ones(d)
-
-r = np.ones(n) * 0.2
-
-rho = np.ones(n) * 1
+from prettytable import PrettyTable
+x = PrettyTable()
+x.field_names = ["n", "obj_ours", "obj_cen", "obj_uncnstr", "disparity(ours) mean", "disparity(ours) max", "disparity(cen) mean", "disparity(cen) max","disparity(uncnstr) mean", "disparity(uncnstr) max"]
 
 
-eps1 = 1e-2
-eps2 = 1e-2
 
-w0 = np.ones(d)
-mu0 = np.zeros((2,n))
-wk, muk = federa_proxAL(X0, X1, w0,mu0, beta, rho, r, eps1, eps2)
+import sys
+sys.path.append("wglobal")
+from wglobal.proxal import federa_proxAL, central_proxAL
+from wglobal.utils.utils import constr_stat, obj_val, cnstr_val, sigmoid
+from wglobal.solve_uc import solve_uc
+from wglobal.utils.prepare_data import load_uci
+from wglobal.admm import admm
 
 
-print(wk)
 
-print(constr_stat(X0, X1, wk, muk, r))
+from prettytable import PrettyTable
+x = PrettyTable()
+x.field_names = ["n", "obj_ours", "obj_cen", "obj_uncnstr", "disparity(ours) mean", "disparity(ours) max", "disparity(ours) global", "disparity(cen) mean", "disparity(cen) max", "disparity(cen) global", "disparity(uncnstr) mean", "disparity(uncnstr) max", "disparity(uncnstr) global"]
+dataset_name = "adult"
 
-wk_c, muk_c = central_proxAL(X0, X1, w0,mu0, beta, r, eps1, eps2)
+for n in [5, 10, 20]:
+    X0, X1, d = load_uci(n, seed=10)
+    X0g, X1g, _ = load_uci(1, seed=10, file_name="adult_test1")
+    X0g = np.squeeze(X0g)
+    X1g = np.squeeze(X1g)
+    mu0 = np.zeros((2,n+1))
+    beta = 10
 
-print(obj_val(X0, X1, wk),obj_val(X0, X1, wk_c))
+    w0 = np.zeros(d)
 
-print(cnstr_val(X0, X1, wk),cnstr_val(X0, X1, wk_c))
+    r = np.ones(n+1) * 0.1
+
+    rho = np.ones(n) * 1e8
+
+    eps1 = 1e-2
+    eps2 = 1e-2
+
+    eps = 1e-50
+
+    wk_u = solve_uc(w0, X0, X1, eps1)
+    
+    
+    wk_c, muk_c, _, _ = central_proxAL(X0, X1, X0g, X1g, w0,mu0, beta, r, eps1, eps2)
+    
+    w0 = np.zeros(d)
+    mu0 = np.zeros((2,n+1))
+    wk, muk, objs, constrs = federa_proxAL(X0, X1, X0g, X1g, w0,mu0, beta, r, rho, eps1, eps2)
+
+    np.save(f"files_new/obj_{dataset_name}_{n}.npy", objs)
+    np.save(f"files_new/constr_{dataset_name}_{n}.npy", constrs)
+    
+
+    federa_obj = obj_val(X0, X1, wk)
+    central_obj = obj_val(X0, X1, wk_c)
+    unconstr_obj = obj_val(X0, X1, wk_u)
+    
+    federa_cnstr = cnstr_val(X0, X1, X0g, X1g, wk)
+    central_cnstr = cnstr_val(X0, X1, X0g, X1g, wk_c)
+    unconstr_cnstr = cnstr_val(X0, X1, X0g, X1g, wk_u)
+
+    x.add_row([n, "{:.4f}".format(federa_obj), "{:.4f}".format(central_obj), "{:.4f}".format(unconstr_obj), \
+               "{:.4f}".format(np.mean(federa_cnstr)), "{:.4f}".format(np.amax(federa_cnstr)), "{:.4f}".format(federa_cnstr[-1]), \
+                "{:.4f}".format(np.mean(central_cnstr)), "{:.4f}".format(np.amax(central_cnstr)), "{:.4f}".format(central_cnstr[-1]), \
+                "{:.4f}".format(np.mean(unconstr_cnstr)), "{:.4f}".format(np.amax(unconstr_cnstr)), "{:.4f}".format(unconstr_cnstr[-1])])
+
+print("experiment setup")
+print(f"beta={beta}\tr={r}\trho={rho}\tn={n}")
+
+print(x)

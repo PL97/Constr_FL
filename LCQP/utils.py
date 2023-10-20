@@ -19,21 +19,27 @@ def generate_data(f_d: int, c_n: int, const_n: int):
     A = np.zeros((f_d, f_d, c_n))
     
     for i in range(c_n):
-        eigAi = np.random.rand(f_d) * 5 + 5 ## resaling
+        eigAi = np.random.rand(f_d) * 0.5 + 0.5 ## uniform distribution over [0.5, 1]
         # r = 0.4
         idx = list(range(eigAi.shape[0]))
         np.random.shuffle(idx)
-        # eigAi[idx[:int(eigAi.shape[0]*r)]] = 0
         temp = np.random.randn(f_d, f_d)
         U, _, _ = np.linalg.svd(temp)
         A[:, :, i] = U.dot(np.diag(eigAi)).dot(U.T)
 
     A[:, :, c_n-1] = np.zeros((f_d, f_d))
     b = np.random.randn(f_d, c_n)
-    b[:, c_n-1] = np.zeros(f_d)
-    C = np.random.randn(const_n, f_d, c_n)
+    for i in range(b.shape[1]):
+        b[:, i] = b[:, i]/np.linalg.norm(b[:, i], ord=2) ## unit euclidean sphere
+    b[:, -1] = 0
+    
+    C = np.random.normal(loc=0, scale=1/np.sqrt(f_d), size=(const_n, f_d, c_n)) ## zero mean and standard deviation of 1/sqrt(d)
     dfull = np.random.randn(const_n, c_n)
+    for i in  range(dfull.shape[1]):
+        dfull[:, i] = dfull[:, i]/np.linalg.norm(dfull[:, i], ord=2) ## unit euclidean sphere
+    dfull[:, -1] = 0
     return A, b, C, dfull
+
 
 
 def format_results(ave_rep: np.array):

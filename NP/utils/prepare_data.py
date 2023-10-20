@@ -16,7 +16,8 @@ def parse_args():
 
 def load_uci(name="adult", num_split=5, seed=10):
     np.random.seed(seed)
-    path = "/home/le/Constr_FL/Cleaned_UCI_Datasets/binary_data/"
+    # path = "/home/le/Constr_FL/Cleaned_UCI_Datasets/binary_data/"
+    path = "/home/jusun/shared/Cleaned_UCI_Datasets/binary_data/"
     # df = pd.read_csv(os.path.join(path, name+".csv")).iloc[:300, :]
     df = pd.read_csv(os.path.join(path, name+".csv"))
 

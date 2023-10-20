@@ -14,10 +14,9 @@ def proxAL(w0, mu0full, A, b, C, dfull, admm, beta, rhofull, eps1, eps2, bars = 
 
     Qal = np.zeros((d, d, n))
     pal = np.zeros((d, n))
-
+    outiter = 0
     for k in range(K + 1):
-        print(k)
-
+        outiter += 1
         # tolerance
         tauk = bars / ((k + 1) ** 2)
         for i in range(n):
@@ -38,9 +37,14 @@ def proxAL(w0, mu0full, A, b, C, dfull, admm, beta, rhofull, eps1, eps2, bars = 
             if np.max(np.abs(mupfull - mukfull)) <= beta * eps2:
                 break
         ttiniter += initer
+        
+        objval = 0
+        for i in range(n):
+            objval = objval + wc.T @ A[:, :, i] @ wc / 2 + b[:, i].T @ wc
+        print("obj", objval)
 
     w = wc
-    outiter = k + 1
+    
 
     objval = 0
     for i in range(n):

@@ -3,36 +3,66 @@ from proxAL import proxAL
 from cproxAL import cproxAL
 from admm import admm
 from utils import format_results, generate_data
+from copy import deepcopy
+from collections import defaultdict
+from prettytable import PrettyTable
+
+
+def format_results(ave_rep):
+    """format the output
+
+    Args:
+        ave_rep (np.array): output results where idx 0, 3, 5 is the centralized proxAL, whereas 0, 2, 4, 6 is the proxAL
+            Notably, the order is obj value, constrain value, outlier iter, and inner iter (if exists)
+    """ 
+    myTable = PrettyTable(["d", "n", "m", "obj_cpal", "obj_fl", "diff", "constr_cpal", "constr_fl", "outeriter_cpal", "outeriter_fl"])
+    for k, tmp_dict in ave_rep.items():
+        d, n, m = k.split("_")
+        objcpal = tmp_dict['objcpal']
+        constrcpal = tmp_dict['constrcpal']
+        coutiter = tmp_dict['coutiter']
+        
+        objpal = tmp_dict['objpal']
+        constrpal = tmp_dict['constrpal']
+        floutiter = tmp_dict['floutiter']
+        
+        diff = [abs(x - y) for x, y in zip(objcpal, objpal)]
+        
+        myTable.add_row([f"{d}", f"{n}", f"{m}", \
+                            f"{np.mean(objcpal)}±{np.std(objcpal)}", \
+                            f"{np.mean(objpal)}±{np.std(objpal)}", \
+                            f"{np.mean(diff)}±{np.std(diff)}", \
+                            f"{np.mean(constrcpal)}±{np.std(constrcpal)}", \
+                            f"{np.mean(constrpal)}±{np.std(constrpal)}", \
+                            f"{np.mean(coutiter)}±{np.std(coutiter)}", \
+                            f"{np.mean(floutiter)}±{np.std(floutiter)}"])
+    
+    print(myTable)
+
 
 # Define the size table
+
 d_n_m = np.array([
-    [100, 1, 1],
-    [200, 1, 1],
-    [300, 1, 1],
-    [400, 1, 1],
-    [500, 1, 1]
-    # [100, 10, 1],
-    # [100, 20, 1],
-    # [200, 10, 2],
-    # [200, 20, 2],
-    # [300, 10, 3],
-    # [300, 20, 3],
-    # [400, 10, 4],
-    # [400, 20, 4],
-    # [500, 10, 5],
-    # [500, 20, 5]
+    [100, 1, 1], 
+    [100, 5, 1],
+    [100, 10, 1], 
+    [300, 1, 3], 
+    [300, 5, 3], 
+    [300, 10, 3], 
+    [500, 1, 5], 
+    [500, 5, 5], 
+    [500, 10, 5]
 ])
 
 num_spl, _ = d_n_m.shape
 
 # num_spl = 1
 
-num_rdn = 1
-
 seed=10
+repeat_run = 10
 
-
-list_rec = np.zeros(7)
+# list_rec = np.zeros(7)
+results = {}
 
 
 
@@ -40,36 +70,47 @@ for ii in range(num_spl):
 
     # problem size
     d, n, m = d_n_m[ii]
+    n = n+1
 
     # random seed
     np.random.seed(seed)
 
     # generate the random matrices A, b, C, d
     A, b, C, dfull = generate_data(d, n, m)
-
-    # hyperparameters
-    eps1 = 1e-4
-    eps2 = 1e-4
-    beta = 1
-    rhofull = np.ones(n) * 10
-    w0 = np.ones(d)
-    mu0full = np.zeros((m, n))
-
-    # centralized proximal AL method
-    # Assuming you've implemented the cproxAL function properly
-    ret_cprox = cproxAL(w0, mu0full, A, b, C, dfull, beta, eps1, eps2)
-
-    list_rec[1] = ret_cprox["objcpal"]
-    list_rec[3] = ret_cprox["constrcpal"]
-    list_rec[5] = ret_cprox["coutiter"]
-
-    # proximal AL based FL algorithm
-    # Assuming you've implemented the proxAL function properly
-    ret_prox = proxAL(w0, mu0full, A, b, C, dfull, admm, beta, rhofull, eps1, eps2)
-
-    list_rec[0] = ret_prox["objpal"]
-    list_rec[2] = ret_prox["constrpal"]
-    list_rec[4] = ret_prox["floutiter"]
-    list_rec[6] = ret_prox["flttiniter"]
     
-    format_results(list_rec)
+    tmp_results = defaultdict(lambda: [])
+    for _ in range(repeat_run):
+        np.random.seed(_)
+        # hyperparameters
+        eps1 = 1e-3
+        eps2 = 1e-3
+        beta = 10
+        rhofull = np.ones(n) * 1
+        w0 = np.random.rand(d)
+        w0 = np.random.rand(d)
+        w0 = w0/np.linalg.norm(w0, ord=2)
+        w0_init = deepcopy(w0)
+        mu0full = np.zeros((m, n))
+        bars=1e-2
+
+        # centralized proximal AL method
+        # Assuming you've implemented the cproxAL function properly
+        ret_cprox = cproxAL(w0, mu0full, A, b, C, dfull, beta, eps1, eps2, bars=bars)
+
+        tmp_results['objcpal'].append(ret_cprox["objcpal"])
+        tmp_results['constrcpal'].append(ret_cprox["constrcpal"])
+        tmp_results['coutiter'].append(ret_cprox["coutiter"])
+        
+        w0 = w0_init
+        # proximal AL based FL algorithm
+        # Assuming you've implemented the proxAL function properly
+        ret_prox = proxAL(w0, mu0full, A, b, C, dfull, admm, beta, rhofull, eps1, eps2, bars=bars)
+
+        tmp_results['objpal'].append((ret_prox["objpal"]))
+        tmp_results['constrpal'].append((ret_prox["constrpal"]))
+        tmp_results['floutiter'].append(ret_prox["floutiter"])
+    
+    results[f"{d}_{n-1}_{m}"] = tmp_results
+    format_results(results)
+print("\n\n\n")
+format_results(results)
