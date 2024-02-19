@@ -62,13 +62,10 @@ python fairClassification.py --n_client [e.g., 1, 5, 10, 20] --repeat_idx [rando
 
 ## How to cite this work
 
-```bibtex
-@misc{he2023proximal,
-      title={A proximal augmented Lagrangian based algorithm for federated learning with global and local convex conic constraints}, 
-      author={Chuan He and Le Peng and Ju Sun},
-      year={2023},
-      eprint={2310.10117},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
-}
+```bibte
+@article{he2023proximal,
+  title={Federated learning with convex global and local constraints},
+  author={Chuan He and Le Peng and Ju Sun},
+  journal={arXiv preprint arXiv:2310.10117},
+  year={2023}}
 ```
