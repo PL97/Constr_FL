@@ -23,8 +23,7 @@ straints"
 | task      | datasets|
 | ----------- |----------|
 | Linear Equality Constrainted Quadratic Programming (LCQP)      | synthetic data (automatically generated when running the scripts) |
-| Nayman-Pearson Classification (NP)      | breast-cancer-wisc; adult-a, monks-1 [download :link:](https://drive.
-google.com/drive/folders/1-7MYuNNOBvOJ_s9-h_lwB14IajkoNCMK?usp=drive_link)  |
+| Nayman-Pearson Classification (NP)      | breast-cancer-wisc; adult-a, monks-1 [download :link:](https://drive.google.com/drive/folders/1-7MYuNNOBvOJ_s9-h_lwB14IajkoNCMK?usp=drive_link)  |
 | Classification with Fairness Constraints (Fairness)      | breast-cancer-wisc; adult-a, monks-1 [download :link:](https://drive.google.com/drive/folders/1-7MYuNNOBvOJ_s9-h_lwB14IajkoNCMK?usp=drive_link)  |
 
 ## Installation
