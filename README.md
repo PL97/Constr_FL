@@ -14,8 +14,7 @@ There are three problems in this repo
    and place under the project folder -->
 ## FedNLP
 
-Git repo for paper "Federated Learning with Convex Global and Local Con-
-straints"
+Git repo for paper "Federated Learning with Convex Global and Local Constraints"
 
 
 
