@@ -16,7 +16,7 @@ def cproxAL(w0, mu0full, A, b, C, dfull, beta, eps1, eps2, bars=0.01):
         pal = np.zeros((d, 1))
 
         # tolerance
-        tauk = bars / (k + 1) ** 2
+        # tauk = bars / (k + 1) ** 2
         for i in range(n):
             Qal = Qal + A[:, :, i] + beta * C[:, :, i].T @ C[:, :, i] + Id / ((n + 1) * beta)
             pal = pal + b[:, i].reshape(-1, 1) + beta * C[:, :, i].T @ (mukfull[:, i].reshape(-1, 1) / beta + dfull[:, i].reshape(-1, 1)) - wc.reshape(-1, 1) / ((n + 1) * beta)

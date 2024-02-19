@@ -16,6 +16,7 @@ def format_results(ave_rep):
             Notably, the order is obj value, constrain value, outlier iter, and inner iter (if exists)
     """ 
     myTable = PrettyTable(["d", "n", "m", "obj_cpal", "obj_fl", "diff", "constr_cpal", "constr_fl", "outeriter_cpal", "outeriter_fl"])
+    tmp_dict = defaultdict(lambda: defaultdict(lambda: {}))
     for k, tmp_dict in ave_rep.items():
         d, n, m = k.split("_")
         objcpal = tmp_dict['objcpal']
@@ -26,7 +27,7 @@ def format_results(ave_rep):
         constrpal = tmp_dict['constrpal']
         floutiter = tmp_dict['floutiter']
         
-        diff = [abs(x - y) for x, y in zip(objcpal, objpal)]
+        diff = [abs(abs(x - y)/x) for x, y in zip(objcpal, objpal)]
         
         myTable.add_row([f"{d}", f"{n}", f"{m}", \
                             f"{np.mean(objcpal)}±{np.std(objcpal)}", \
@@ -55,8 +56,6 @@ d_n_m = np.array([
 ])
 
 num_spl, _ = d_n_m.shape
-
-# num_spl = 1
 
 seed=10
 repeat_run = 10
@@ -87,11 +86,10 @@ for ii in range(num_spl):
         beta = 10
         rhofull = np.ones(n) * 1
         w0 = np.random.rand(d)
-        w0 = np.random.rand(d)
         w0 = w0/np.linalg.norm(w0, ord=2)
         w0_init = deepcopy(w0)
         mu0full = np.zeros((m, n))
-        bars=1e-2
+        bars=0.1
 
         # centralized proximal AL method
         # Assuming you've implemented the cproxAL function properly
@@ -109,6 +107,23 @@ for ii in range(num_spl):
         tmp_results['objpal'].append((ret_prox["objpal"]))
         tmp_results['constrpal'].append((ret_prox["constrpal"]))
         tmp_results['floutiter'].append(ret_prox["floutiter"])
+        
+        tmp_dict[n][_] = {
+            "c_w": central_w,
+            "c_obj": central_obj,
+            "c_constr": central_cnstr,
+            "u_w": uncontr_w,
+            "u_obj": unconstr_obj,
+            "u_constr": unconstr_cnstr,
+            "f_w": federa_w,
+            "f_obj": federa_obj,
+            "f_constr": federa_cnstr
+        }
+        
+        json_object = json.dumps(tmp_dict, indent=4, cls=NumpyEncoder)
+        
+        with open(f"new_files_plot/{dataset_name}_repeat_{repeat_run}_{args.n_client}.json", "w") as outfile:
+            outfile.write(json_object)
     
     results[f"{d}_{n-1}_{m}"] = tmp_results
     format_results(results)

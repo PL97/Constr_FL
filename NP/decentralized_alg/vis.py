@@ -9,10 +9,10 @@ if __name__ == "__main__":
     fig, axs = plt.subplots(nrows=1, ncols=3, sharey=False, figsize=(15, 4))
     ax2s = []
     n = 5
-    for tmpi, dataset_name in enumerate(["breast-cancer-wisc", "adult", "monks-1"]):
+    for tmpi, dataset_name in enumerate(["breast-cancer-wisc", "adult-a", "monks-1"]):
         constr_val = 0.2
-        data = np.load(f"new_files/obj_{dataset_name}_{n}.npy")
-        consts = np.load(f"new_files/constr_{dataset_name}_{n}.npy")
+        data = np.load(f"new_files_plot/obj_{dataset_name}_{n}_0.npy")
+        consts = np.load(f"new_files_plot/constr_{dataset_name}_{n}_0.npy")
 
         import matplotlib.pyplot as plt
          
@@ -77,4 +77,4 @@ if __name__ == "__main__":
         #     ax2.get_yaxis().set_visible(False)
     # axs[0].get_shared_y_axes().join(*ax2s)
     fig.tight_layout()
-    plt.savefig(f"new_files/{dataset_name}_constrs.png", bbox_inches = 'tight')
+    plt.savefig(f"new_files_plot/{dataset_name}_constrs.png", bbox_inches = 'tight')

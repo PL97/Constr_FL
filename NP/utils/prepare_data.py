@@ -19,11 +19,17 @@ def load_uci(name="adult", num_split=5, seed=10):
     # path = "/home/le/Constr_FL/Cleaned_UCI_Datasets/binary_data/"
     path = "/home/jusun/shared/Cleaned_UCI_Datasets/binary_data/"
     # df = pd.read_csv(os.path.join(path, name+".csv")).iloc[:300, :]
-    df = pd.read_csv(os.path.join(path, name+".csv"))
+    # if name == "adult":
+    if False:
+        df = pd.read_csv(r"/home/jusun/peng0347/Constr_FL/data/adult_data.csv")
+        features, labels = df.drop('salary', axis=1).to_numpy(), df['salary'].to_numpy()
+    else:
+        df = pd.read_csv(os.path.join(path, name+".csv"))
+        features = df.iloc[:, :-1].to_numpy()
+        labels = df.iloc[:, -1].to_numpy()
 
     n_total = df.shape[0]
-    features = df.iloc[:, :-1].to_numpy()
-    labels = df.iloc[:, -1].to_numpy()
+    
 
     X0_all, X1_all = features[labels==0], features[labels==1]
     idx0 = list(range(X0_all.shape[0]))

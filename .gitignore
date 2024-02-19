@@ -1,5 +1,11 @@
 Cleaned_UCI_Datasets/
 
 *.txt
-files*/
+log_files*/
 new_files*/
+*.pyc
+*.csv
+*.slurm
+woglobal/
+data/
+centralized_algs/

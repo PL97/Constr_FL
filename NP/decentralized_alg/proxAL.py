@@ -5,13 +5,13 @@ from admm import constr_stat, obj_val, cnstr_val
 
 eps = 1e-50
 
-def central_proxAL(X0,X1,w0,mu0, beta,r,eps1,eps2):
+def central_proxAL(X0,X1,w0,mu0, beta,r,eps1,eps2, bars = 0.001):
     Ni0, Ni1 = X0.shape[1], X1.shape[1]
     n = X0.shape[2]
     wk = w0.copy()
     muk = mu0.copy()
 
-    bars = 0.001
+    
 
     K=100
 
@@ -38,7 +38,7 @@ def central_proxAL(X0,X1,w0,mu0, beta,r,eps1,eps2):
             return proxAL_val
 
 
-        wk = minimize(proxAL_subpb, wk_copy, tol=tauk, method="L-BFGS-B")['x']
+        wk = minimize(proxAL_subpb, wk_copy, tol=tauk*1e-3, method="L-BFGS-B")['x']
 
 
 
@@ -57,12 +57,11 @@ def central_proxAL(X0,X1,w0,mu0, beta,r,eps1,eps2):
     return wk, muk
 
 
-def federa_proxAL(X0, X1, w0,mu0,eps1, eps2, beta, rho, r):
+def federa_proxAL(X0, X1, w0,mu0,eps1, eps2, beta, rho, r, bars = 0.001):
     n = X0.shape[2]
     wk = w0.copy()
     muk = mu0.copy()
 
-    bars = 0.001
 
     K=100
 

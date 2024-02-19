@@ -82,7 +82,7 @@ def admm(X0, X1, w0,muk,wk,tauk, rho, beta, r):
 
 
 
-    T = 1000
+    T = 300
     q = 0.9
 
 
@@ -124,7 +124,7 @@ def admm(X0, X1, w0,muk,wk,tauk, rho, beta, r):
 
             uit_copy = ut[:, i].copy()
 
-            ut[:, i] = minimize(phi, uit_copy, tol=vareps, method="L-BFGS-B")['x']
+            ut[:, i] = minimize(phi, uit_copy, tol=vareps*1e-2, method="L-BFGS-B")['x']
 
             lmda[:, i] = lmda[:, i] + rho[i] * (ut[:, i] - wt)
 
@@ -142,10 +142,10 @@ def admm(X0, X1, w0,muk,wk,tauk, rho, beta, r):
             break
 
         stat_mea = np.linalg.norm(DP_all,np.inf)
-        if np.mod(t,100) == 0:
-            print("---------------", t,"/",T ,"-------------------")
-            # print("stationary uperbound:", np.sum(tepst_vec))
-            # print("true stationary measure:", stat_mea)
+        # if np.mod(t,10) == 0:
+        #     print("---------------", t,"/",T ,"-------------------")
+        #     print("stationary uperbound:", np.sum(tepst_vec))
+        #     print("true stationary measure:", stat_mea)
 
 
     return wt, t
