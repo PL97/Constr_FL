@@ -63,10 +63,14 @@ python fairClassification.py --n_client [e.g., 1, 5, 10, 20] --repeat_idx [rando
 ## How to cite this work
 
 ```bibtex
-@article{he2023proximal,
-  title={Federated learning with convex global and local constraints},
-  author={Chuan He and Le Peng and Ju Sun},
-  journal={arXiv preprint arXiv:2310.10117},
-  year={2023}
+@article{
+he2024federated,
+title={Federated Learning with Convex Global and Local Constraints},
+author={Chuan He and Le Peng and Ju Sun},
+journal={Transactions on Machine Learning Research},
+issn={2835-8856},
+year={2024},
+url={https://openreview.net/forum?id=qItxVbWyfe},
+note={}
 }
 ```
